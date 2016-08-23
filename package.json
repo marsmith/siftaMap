@@ -1,0 +1,37 @@
+{
+  "name": "sifta-map",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "webpack:w": "webpack --watch",
+    "lite": "lite-server",
+    "start": "concurrently \"npm run webpack:w\" \"npm run lite\" ",
+    "webpack": "webpack"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "bootstrap-sidebar": "^0.2.2-retry",
+    "esri-leaflet": "^2.0.2",
+    "jquery": "^3.1.0",
+    "leaflet": "^1.0.0-rc.3",
+    "turf": "^3.0.14"
+  },
+  "devDependencies": {
+    "babel-core": "^6.13.2",
+    "babel-loader": "^6.2.4",
+    "clean-webpack-plugin": "^0.1.9",
+    "concurrently": "^2.0.0",
+    "copy-webpack-plugin": "^3.0.1",
+    "core-js": "^2.4.0",
+    "css-loader": "^0.23.1",
+    "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.22.0",
+    "lite-server": "^2.2.0",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.1"
+  }
+}
