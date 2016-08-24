@@ -54,8 +54,9 @@
     font-weight:300;
 }
 
-.navBarButton{
-    margin-top:12px;
+#top-menu .navBarButton{
+    float:right;
+    margin-top:20px;
     margin-right:12px;
 }
 
@@ -101,7 +102,8 @@ html, body, .angular-leaflet-map {
    padding: 0; 
    margin: 0;
    height: 100%;
-   width: 100%;
+   /*width: 100%;*/
+  font-family: 'Open Sans', sans-serif;
 }
 
 body {
@@ -226,10 +228,13 @@ body {
     ===========================
 */
 
+.menu-chevron {
+  padding-left:8px;
+}
 
 #main-menu {
   width: 270px;
-  height: calc(100% - 66px);
+  height: calc(100% - 70px);
   float: left;
   background-color: #20202f;
   margin-top: 65px;
@@ -248,13 +253,10 @@ body {
   left: 0;
 }
 
-#main-menu > div {
-  border-top: 1px solid #191924;
-}
-
 #main-menu .main-menu-container {
-  overflow-y: auto;
-  height: calc(100% - 56px);
+  overflow-y: scroll;
+  height: 100%;
+  /*height: calc(100% - 56px);*/
 }
 
 #main-menu .section .item h4 {
@@ -262,7 +264,7 @@ body {
 }
 
 #main-menu .menu-content {
-  padding: 0 15px 0 10px;
+  /*padding: 0 15px 0 10px;*/
 }
 
 #main-menu .section h3 {
@@ -529,7 +531,7 @@ body {
   }
 
   #main-menu {
-    height: calc(100% - 55px);
+    height: calc(100% - 70px);
   }
 
 }
@@ -607,7 +609,12 @@ pre {
   color: #6F758E;
   background-color: #ECEEF3;
 }
-
+/*#main-menu .wim-sidebar-panel .panel-heading h4 a:after {
+  padding: 0 0 0 10px;
+  content: '\f3d3';
+  font-family: 'ionicons';
+  color: #6F758E;
+}*/
 #main-menu .wim-sidebar-panel .panel-heading h4 a:hover {
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.5);

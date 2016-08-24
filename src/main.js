@@ -120,6 +120,10 @@ $( document ).ready(function() {
 	});
 	
 	//LISTENERS
+	 $("#mobile-main-menu").click(function(event) {
+		 $('body').toggleClass('isOpenMenu')
+	 })
+
     $(".dataFilterSelect").change(function(event) {
 
 	});
@@ -241,7 +245,7 @@ $(document).ajaxStop(function () {
 		console.log('siteCount: ',siteData.features.length);
 		console.log('bad Sites: ', badSites.length);
 		console.log(siteData);
-		parseGeoJSON()
+		parseGeoJSON();
 		
 		$("#loadingGages").hide();
 	}
