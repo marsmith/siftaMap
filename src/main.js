@@ -218,12 +218,7 @@ $( document ).ready(function() {
 	
 $(document).ajaxStop(function () {
 	if (siteData.features.length > 1) {
-		
-		console.log('siteCount: ',siteData.features.length);
-		console.log('bad Sites: ', badSites.length);
-		console.log(siteData);
 		parseGeoJSON();
-		
 		$("#loadingGages").hide();
 	}
 });
@@ -332,67 +327,32 @@ function summarizeSites(featureCollection) {
 }
 
 function parseGeoJSON() {
-	$.each(siteData.features, function (index, siteGeoJSON) {
-		//console.log('here', siteGeoJSON)
+	for (var i = siteData.features.length - 1; i >= 0; i--) {
 
-		siteGeoJSON.properties.collectionCodeList = [];
-		siteGeoJSON.properties.collectionCategoryList = [];
+		var siteGeoJSON = siteData.features[i];
 
-		//pull out category and collection codes
-		$.each(siteGeoJSON.properties.AgmtInfo, function (index, info) {
-			console.log(index, info);
+		//make sure there is something
+		if (siteGeoJSON) {
 
-			if(info.CollectionCode && siteGeoJSON.properties.collectionCodeList.indexOf(info.CollectionCode) == -1) {
-				siteGeoJSON.properties.collectionCodeList.push(info.CollectionCode);
+			//make the coordinates numbers
+			siteGeoJSON.geometry.coordinates = [parseFloat(siteGeoJSON.geometry.coordinates[0]),parseFloat(siteGeoJSON.geometry.coordinates[1])];
+
+			//remove site if lat or long is 'NA'
+			if (isNaN(siteGeoJSON.geometry.coordinates[0]) || isNaN(siteGeoJSON.geometry.coordinates[1])) {
+				console.log('Bad geojson site found, deleting site: ', siteGeoJSON, siteData.features.length)
+				siteData.features.splice(i, 1);
+				badSites.push(siteGeoJSON);
 			}
-			if(info.CollectionCategory && siteGeoJSON.properties.collectionCategoryList.indexOf(info.CollectionCategory) == -1) {
-				//console.log(siteGeoJSON.properties.collectionCategoryList);
-				siteGeoJSON.properties.collectionCategoryList.push(info.CollectionCategory);
 
-				//keep track of any new collection categories
-				if(siteTypes.indexOf(info.CollectionCategory) == -1) {
-					siteTypes.push(info.CollectionCategory);
-				}
-			}
-			
-		});
+			siteGeoJSON.properties.collectionCodeList = [];
+			siteGeoJSON.properties.collectionCategoryList = [];
 
-		siteData.features.push(siteGeoJSON);
-	});
-
-	//showPoints()
-}
-
-function buildGeoJSON(siftaSite) {
-
-	//dumb check for good site number [was finding some with periods]
-	if (!/^\d+$/.test(siftaSite.SiteNo)) {
-		console.error("There is a problem with this site number: ", siftaSite.SiteNo)
-		badSites.push(siftaSite);
-		return;
-	}
-
-	//console.log('in queryNWIS: ', siftaSite);
-	$.ajax({
-		url:'http://waterservices.usgs.gov/nwis/site/?format=mapper,1.0&sites=' + siftaSite.SiteNo,
-		dataType: 'xml',
-		success: function(document){
-			$(document).find("site").each(function(){
-				var siteNumber = siftaSite.SiteNo;
-				var lat = $(this).attr('lat');
-				var lng = $(this).attr('lng');
-				var siteGeoJSON = { 
-					"type": "Feature",
-					"geometry": {"type": "Point", "coordinates": [parseFloat(lng), parseFloat(lat)]},
-					"properties": siftaSite
-				};
-
-				siteGeoJSON.properties.collectionCodeList = [];
-				siteGeoJSON.properties.collectionCategoryList = [];
-				//console.log(siteGeoJSON)
+			//temp method to get into agreement object
+			$.each(siteGeoJSON.properties, function (index, identifier) {
 
 				//pull out category and collection codes
-				$.each(siftaSite.SiteInfo, function (index, info) {
+				$.each(identifier.AgmtInfo, function (index, info) {
+					//console.log(index, info);
 
 					if(info.CollectionCode && siteGeoJSON.properties.collectionCodeList.indexOf(info.CollectionCode) == -1) {
 						siteGeoJSON.properties.collectionCodeList.push(info.CollectionCode);
@@ -408,26 +368,26 @@ function buildGeoJSON(siftaSite) {
 					}
 					
 				});
-
-				siteData.features.push(siteGeoJSON);		
 			});
-		},
-		error: function(){
-			badSites.push(siftaSite);
-			console.error("There was an error with NWIS query for:  ", siftaSite.SiteNo);
 		}
-	});
+	}
+
+	console.log('after parse: ',siteData);
+	console.log('siteCount: ',siteData.features.length);
+	console.log('bad Sites: ', badSites.length);
+	showPoints()
 }
 
 function showPoints() {
 	$("#loadingGages").hide();
-		
+
 	$.each(siteTypes, function(index,siteType) {
 		
 		var icon = L.icon({iconUrl: 'images/' + siteType + '_act_16.png',iconSize: [16, 22]});
 		if(window[siteType + 'Sites']) window[siteType + 'Sites'] 
 		window[siteType + 'Sites'] = L.geoJson(siteData, {
 			onEachFeature: function (feature, layer) {
+				//console.log(feature, layer);
 
 				//build site info display for popup
 				var siteInfoContent = '';
@@ -456,15 +416,16 @@ function showPoints() {
 						}
 					}
 				});
-				//var popupTemplate =  '<h5>' + feature.properties.SiteNo + '</h5><table class="table table-condensed" style="font-size:8px;"><tr><td>Site Name</td><td>' + feature.properties.SiteInfo.SiteName + '</td></tr><tr><td>Site Type</td><td>' + feature.properties.collectionCategoryList + '</td></tr><tr><td>Collection Code</td><td>' + feature.properties.collectionCodeList + '</td></tr><tr><td>NWIS Web link</td><td><a href="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=' + feature.properties.SiteNo + '" target="_blank">link</a></td></tr><tr><td>SIMS link</td><td><a href="http://sims.water.usgs.gov/SIMSClassic/StationInfo.asp?office_id=375&site_id=' + feature.properties.SiteNo + '}" target="_blank">link</a></td></tr>' + siteInfo + '</table>'
 
-				var popupTemplate = '<h5>' + feature.properties.SiteNo + '</h5><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Site Info</a></li>' + siteInfoTab + '</ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="home"><table class="table table-condensed"><tr><td>Site Name</td><td>' + feature.properties.SiteInfo.SiteName + '</td></tr><tr><td>Site Type</td><td>' + feature.properties.collectionCategoryList + '</td></tr><tr><td>Collection Code</td><td>' + feature.properties.collectionCodeList + '</td></tr><tr><td>NWIS Web link</td><td><a href="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=' + feature.properties.SiteNo + '" target="_blank">link</a></td></tr><tr><td>SIMS link</td><td><a href="http://sims.water.usgs.gov/SIMSClassic/StationInfo.asp?office_id=375&site_id=' + feature.properties.SiteNo + '}" target="_blank">link</a></td></tr></table></div>' + siteInfoContent + '</div>';
+				var popupTemplate = '</div>' + siteInfoContent + '</div>';				
+
+				// var popupTemplate = '<h5>' + feature.properties.SiteNo + '</h5><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Site Info</a></li>' + siteInfoTab + '</ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="home"><table class="table table-condensed"><tr><td>Site Name</td><td>' + feature.properties.SiteInfo.SiteName + '</td></tr><tr><td>Site Type</td><td>' + feature.properties.collectionCategoryList + '</td></tr><tr><td>Collection Code</td><td>' + feature.properties.collectionCodeList + '</td></tr><tr><td>NWIS Web link</td><td><a href="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=' + feature.properties.SiteNo + '" target="_blank">link</a></td></tr><tr><td>SIMS link</td><td><a href="http://sims.water.usgs.gov/SIMSClassic/StationInfo.asp?office_id=375&site_id=' + feature.properties.SiteNo + '}" target="_blank">link</a></td></tr></table></div>' + siteInfoContent + '</div>';
 		
 				//console.log(popupTemplate);
 				layer.bindPopup(popupTemplate);
 			},
 			pointToLayer: function (feature, latlng) {
-				if (feature.properties.collectionCategoryList.indexOf(siteType) != -1) return L.marker(latlng, {icon: icon});
+				if (feature.properties.collectionCategoryList && feature.properties.collectionCategoryList.indexOf(siteType) != -1) return L.marker(latlng, {icon: icon});
 			}
 		}).addTo(map);
 					

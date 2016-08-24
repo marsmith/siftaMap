@@ -5,7 +5,6 @@ module.exports = {
     devtool: 'source-map',
     entry: {
         main: ['./src/main.js',
-            // 'turf/turf.min',
             'bootstrap/dist/js/bootstrap',
             'bootstrap/dist/css/bootstrap.css',
             'bootstrap-sidebar/dist/css/sidebar.css',
