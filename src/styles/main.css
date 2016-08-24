@@ -144,7 +144,7 @@ body {
 #top-menu .title {
   border-right: 1px solid #191924;
   min-width: 270px;
-  cursor: pointer;
+  /*cursor: pointer;*/
 }
 
 #top-menu .title h2 {
@@ -196,6 +196,7 @@ body {
 
 #mobile-main-menu {
   padding: 24px 15px;
+  color:white;
 }
 
 #mobile-main-menu img {
@@ -523,7 +524,7 @@ body {
   }
 
   #mobile-main-menu {
-    padding: 17px 15px;
+    /*padding: 17px 15px;*/
   }
 
   #top-menu .top-menu-container {
@@ -546,6 +547,7 @@ body {
 
   .app-name-mobile {
     display: inline;
+    font-size:small;
   }
 
 }

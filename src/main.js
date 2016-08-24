@@ -79,7 +79,8 @@ var fiscalYear;
 $( document ).ready(function() {
 
 	/* create map */
-	map = L.map('mapDiv').setView([42.7, -76.2], 7);
+	map = L.map('mapDiv',{ zoomControl: false }).setView([42.7, -76.2], 7);
+	new L.Control.Zoom({ position: 'topright' }).addTo(map);
 	var layer = esri.basemapLayer('NationalGeographic', {opacity: 0.7}).addTo(map);
 
 	//get fiscal year
