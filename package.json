@@ -16,8 +16,7 @@
     "bootstrap-sidebar": "^0.2.2-retry",
     "esri-leaflet": "^2.0.2",
     "jquery": "^3.1.0",
-    "leaflet": "^1.0.0-rc.3",
-    "turf": "^3.0.14"
+    "leaflet": "^1.0.0-rc.3"
   },
   "devDependencies": {
     "babel-core": "^6.13.2",
