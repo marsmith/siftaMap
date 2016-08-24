@@ -405,7 +405,8 @@ function showPoints() {
 
 								if(today > startDate && today < endDate) {
 									
-									var tableData = '<tr><td>Start Date</td><td>' + data.Agreement.StartDate+ '</td></tr>' +
+									var tableData = '<tr><td>Agreement ID</td><td>' + data.Agreement.AgreementID + '</td></tr>' +
+												'<tr><td>Start Date</td><td>' + data.Agreement.StartDate + '</td></tr>' +
 												'<tr><td>End Date</td><td>' + data.Agreement.EndDate + '</td></tr>' + 
 												'<tr><td>Customer Name</td><td>' + data.Agreement.CustomerName + '</td></tr>' + 
 												'<tr><td>Customer Funding</td><td>$' + data.Agreement.FundingCustomer + '</td></tr>' + 
@@ -423,7 +424,7 @@ function showPoints() {
 						var popupTemplate = '<h5>' + property.SiteNo + '</h5><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Site Info</a></li>' + siteInfoTab + '</ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="home"><table class="table table-condensed"><tr><td>Site Name</td><td>' + property.SiteName + '</td></tr><tr><td>Site Type</td><td>' + feature.properties.collectionCategoryList + '</td></tr><tr><td>Collection Code</td><td>' + feature.properties.collectionCodeList + '</td></tr><tr><td>NWIS Web link</td><td><a href="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=' + property.SiteNo + '" target="_blank">link</a></td></tr><tr><td>SIMS link</td><td><a href="http://sims.water.usgs.gov/SIMSClassic/StationInfo.asp?office_id=375&site_id=' + property.SiteNo + '}" target="_blank">link</a></td></tr></table></div>' + siteInfoContent + '</div>';
 				
 						//console.log(popupTemplate);
-						layer.bindPopup(popupTemplate);
+						layer.bindPopup(popupTemplate, {minWidth: 300});
 					}
 				});
 
