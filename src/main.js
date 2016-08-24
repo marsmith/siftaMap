@@ -60,10 +60,7 @@ var ny = {
   ]
 }
 
-var siteData = { 
-	"type": "FeatureCollection",
-    "features": []
-}
+var siteData;
 var layerLabels;
 var visibleLayers = [];
 var identifiedFeature;
@@ -93,27 +90,6 @@ $( document ).ready(function() {
 	setupDataFilters();
 	parseBaseLayers();
 	//summarizeSites(ny);
-
-	//main call
-	$( "#loadSifta" ).click(function() {
-		//main site parsing
-
-		$.getJSON('SIFTAList.json', function (siftaList) {				
-			console.log('Got main sifta list', siftaList);
-
-			//loop main sifta list
-			$.each(siftaList.Sites, function (index, siftaSite) {
-
-				buildGeoJSON(siftaSite)
-			});
-		});
-	});
-
-	//for testing
-	// $.getJSON('sifta.geojson', function (geojson) {		
-	// 	siteData = geojson;
-	// 	siteTypes = ["gw", "sw", "clim", "misc", "qw"];
-	// });
 
 	$.getJSON('SIFTAList.geojson', function (geojson) {		
 		siteData = geojson;
