@@ -89,7 +89,6 @@ $( document ).ready(function() {
 
 	setupDataFilters();
 	parseBaseLayers();
-	//summarizeSites(ny);
 
 	$.getJSON('SIFTAList.geojson', function (geojson) {		
 		siteData = geojson;
@@ -248,6 +247,8 @@ function parseBaseLayers() {
 }
 
 function summarizeSites(featureCollection) {
+
+	$('#resultsData').html('');
 	
 	//get the first feature and add to map 
 	if(featureCollection.features.length > 0){
@@ -284,18 +285,18 @@ function summarizeSites(featureCollection) {
 
 					var $table1 = $('<table class="table table-condensed" style="margin:0px;font-size:10px;"/>');
 					
-					$.each(collectionDescriptions, function(i,v) {
-						$table1.append('<tr><td>' + i + '</td><td>' + v + '</td>');
-					});
+					// $.each(collectionDescriptions, function(i,v) {
+					// 	$table1.append('<tr><td>' + i + '</td><td>' + v + '</td>');
+					// });
+
 					$('#resultsData').append($table1);
 					$('#resultsData').append('</br>');
 					
 					var $table2 = $('<table class="table table-condensed" style="margin:0px;font-size:10px;"/>');
 					
-					$.each(window[siteType + 'Sites_clip_geojson'].features, function (index,site) {
-						$table2.append('<tr><td>' + site.properties.SiteNo + '</td><td>' + site.properties.SiteNo + '</td></tr>')
-						
-					});
+					// $.each(window[siteType + 'Sites_clip_geojson'].features, function (index,site) {
+					// 	$table2.append('<tr><td>' + site.properties.SiteNo + '</td><td>' + site.properties.SiteNo + '</td></tr>')
+					// });
 					
 					$('#resultsData').append($table2);
 					$('#resultsData').append('<hr>');
@@ -387,42 +388,45 @@ function showPoints() {
 		if(window[siteType + 'Sites']) window[siteType + 'Sites'] 
 		window[siteType + 'Sites'] = L.geoJson(siteData, {
 			onEachFeature: function (feature, layer) {
-				//console.log(feature, layer);
 
 				//build site info display for popup
 				var siteInfoContent = '';
 				var siteInfoTab = '';
-
 				var agreementNumber = 1;
-				$.each(feature.properties.SiteInfo , function(index, data) {
-					if (data.Agreement) {
-						var startDate = new Date(data.Agreement.StartDate);
-						var endDate = new Date(data.Agreement.EndDate);
-						var today = new Date();
 
-						if(today > startDate && today < endDate) {
-							
-							var tableData = '<tr><td>Start Date</td><td>' + data.Agreement.StartDate+ '</td></tr>' +
-										 '<tr><td>End Date</td><td>' + data.Agreement.EndDate + '</td></tr>' + 
-										 '<tr><td>Customer Name</td><td>' + data.Agreement.CustomerName + '</td></tr>' + 
-										 '<tr><td>Customer Funding</td><td>$' + data.Agreement.FundingCustomer + '</td></tr>' + 
-										 '<tr><td>USGS CWP Funding</td><td>$' + data.Agreement.FundingUSGSCWP + '</td></tr>';
-			
-							siteInfoTab += '<li role="presentation"><a href="#agreement' + agreementNumber + '" aria-controls="agreement' + agreementNumber + '" role="tab" data-toggle="tab">Agreement ' + agreementNumber + '</a></li>';
-							siteInfoContent += '<div role="tabpanel" class="tab-pane" id="agreement' + agreementNumber + '"><table class="table table-condensed">' + tableData + '</table></div>';
-							agreementNumber++;
-						} else {
-							//console.log('not valid date');
-						}
+				$.each(feature.properties, function(index,property) {
+					if (/^\d+$/.test(index)) {
+
+						$.each(property.AgmtInfo , function(index, data) {
+							if (data.Agreement) {
+								var startDate = new Date(data.Agreement.StartDate);
+								var endDate = new Date(data.Agreement.EndDate);
+								var today = new Date();
+
+								if(today > startDate && today < endDate) {
+									
+									var tableData = '<tr><td>Start Date</td><td>' + data.Agreement.StartDate+ '</td></tr>' +
+												'<tr><td>End Date</td><td>' + data.Agreement.EndDate + '</td></tr>' + 
+												'<tr><td>Customer Name</td><td>' + data.Agreement.CustomerName + '</td></tr>' + 
+												'<tr><td>Customer Funding</td><td>$' + data.Agreement.FundingCustomer + '</td></tr>' + 
+												'<tr><td>USGS CWP Funding</td><td>$' + data.Agreement.FundingUSGSCWP + '</td></tr>';
+					
+									siteInfoTab += '<li role="presentation"><a href="#agreement' + agreementNumber + '" aria-controls="agreement' + agreementNumber + '" role="tab" data-toggle="tab">Agreement ' + agreementNumber + '</a></li>';
+									siteInfoContent += '<div role="tabpanel" class="tab-pane" id="agreement' + agreementNumber + '"><table class="table table-condensed">' + tableData + '</table></div>';
+									agreementNumber++;
+								} else {
+									//console.log('not valid date');
+								}
+							}
+						});
+
+						var popupTemplate = '<h5>' + property.SiteNo + '</h5><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Site Info</a></li>' + siteInfoTab + '</ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="home"><table class="table table-condensed"><tr><td>Site Name</td><td>' + property.SiteName + '</td></tr><tr><td>Site Type</td><td>' + feature.properties.collectionCategoryList + '</td></tr><tr><td>Collection Code</td><td>' + feature.properties.collectionCodeList + '</td></tr><tr><td>NWIS Web link</td><td><a href="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=' + property.SiteNo + '" target="_blank">link</a></td></tr><tr><td>SIMS link</td><td><a href="http://sims.water.usgs.gov/SIMSClassic/StationInfo.asp?office_id=375&site_id=' + property.SiteNo + '}" target="_blank">link</a></td></tr></table></div>' + siteInfoContent + '</div>';
+				
+						//console.log(popupTemplate);
+						layer.bindPopup(popupTemplate);
 					}
 				});
 
-				var popupTemplate = '</div>' + siteInfoContent + '</div>';				
-
-				// var popupTemplate = '<h5>' + feature.properties.SiteNo + '</h5><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Site Info</a></li>' + siteInfoTab + '</ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="home"><table class="table table-condensed"><tr><td>Site Name</td><td>' + feature.properties.SiteInfo.SiteName + '</td></tr><tr><td>Site Type</td><td>' + feature.properties.collectionCategoryList + '</td></tr><tr><td>Collection Code</td><td>' + feature.properties.collectionCodeList + '</td></tr><tr><td>NWIS Web link</td><td><a href="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=' + feature.properties.SiteNo + '" target="_blank">link</a></td></tr><tr><td>SIMS link</td><td><a href="http://sims.water.usgs.gov/SIMSClassic/StationInfo.asp?office_id=375&site_id=' + feature.properties.SiteNo + '}" target="_blank">link</a></td></tr></table></div>' + siteInfoContent + '</div>';
-		
-				//console.log(popupTemplate);
-				layer.bindPopup(popupTemplate);
 			},
 			pointToLayer: function (feature, latlng) {
 				if (feature.properties.collectionCategoryList && feature.properties.collectionCategoryList.indexOf(siteType) != -1) return L.marker(latlng, {icon: icon});
@@ -431,6 +435,8 @@ function showPoints() {
 					
 		$('#gageToggles').append('<div class="btn-group-vertical lyrTogDiv" style="cursor: pointer;" data-toggle="buttons"> <button id="' + siteType + 'Sites"type="button" class="btn btn-default active layerToggle" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan glyphicon glyphicon-check"></i><span>&nbsp;&nbsp; SiFTA ' + siteType + ' Sites&nbsp;&nbsp;<img alt="Legend Swatch" src="images/' + siteType + '_act_16.png" /></span></button></div>');		
 	});
+
+	summarizeSites(ny);
 
 }
 	
